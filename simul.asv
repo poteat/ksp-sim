@@ -44,6 +44,11 @@
     figure(2)
     plot(t,height);
     title('Height from the surface over time');
+    
+    figure(3)
+    energy = hypot(vx,vy).^2 - S/(height+RAD);
+    plot(t,energy)
+    title('Orbital energy over time');
 
     if (numel(ei)~=0)
         switch ei(1)

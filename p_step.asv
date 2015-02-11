@@ -1,5 +1,3 @@
-% Given a state vector Z(x,y,vx,vy,m) calculate dZ/dT...(vx,vy,ax,ay,dm)
-
 function dx = p_step(~, Z)
 
     global T II IF;
@@ -10,7 +8,6 @@ function dx = p_step(~, Z)
     RAD = 6E5;
     ROT = 174.53;
     D = 9.784758844E-4;
-    ATM = 69077.553;
     H = 5E3;
     G = 9.82;
     
@@ -22,24 +19,22 @@ function dx = p_step(~, Z)
     m = Z(5);
     
     % Non-atmospheric flight prediction
-    h = norm(p)-RAD;
-    energy = norm(v)^2-S/norm(p);
-    angmom = dot(v,p);
-    eccen = sqrt(1+energy*angmom^2)/S;
-    semimajor = 1/(1/norm(p)-norm(v)^2/S);
+    dist = hypot(p);
+    energy = v^2/2 - S/dist;
+    semimajor = -S/(2*energy);
+    eccen = abs(v)^2*dist/S - dot(v,dist)*v/S - dist/abs(dist);
+    apoapsis = 
     
-    apoapsis = semimajor*(1+norm(eccen));
-    fprintf('height:\t%.2f\n',h);
-    fprintf('apoapsis:\t%.2f\n',energy);
-
     % Gravity turn parameters
     turnStart = 10E3;
     turnEnd = 45E3;
     turnShape = .33;
     endAngle = 0;
-    orbitalRadTarget = 68E3;
+    orbitalRadTarget = 65E3;
 
-    % Autopilot control logic (controls angle and throttle)
+    % Autopilot control logic
+    
+    h = norm(p)-RAD;
     angleOffset = atan2d(y,x)-90;
     if (h >= turnStart)
         if (h <= turnEnd)
@@ -57,15 +52,10 @@ function dx = p_step(~, Z)
     TH = TH + angleOffset;
 
     
-    % Physical accelerations and mass change
     atm = exp(-h/H);
     
     grav = -S/norm(p)^3*p;
-    if(h<=ATM)
-        drag = -D*atm*norm(v-ROT)*(v-ROT);
-    else
-        drag = 0;
-    end
+    drag = -D*atm*norm(v-ROT)*(v-ROT);
     thrust = throttle*T/m*[cosd(TH), sind(TH)];
     
     a = thrust + grav + drag;
