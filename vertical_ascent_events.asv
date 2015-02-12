@@ -1,0 +1,21 @@
+
+% 1: Success
+% 2: Out of fuel
+% 3: Surface collision
+% 4: Exit a
+
+function [value, isterminal, direction] = vertical_ascent_events(~,Z)
+    
+    global CRAFT PLANET TARGET
+        MF = CRAFT(5);
+        R  = PLANET(2);
+        TI = TARGET(1);
+    
+    h = norm(Z(1))-R;
+    m = Z(5);
+    
+    value = [h-TI; m-MF; h];
+    isterminal = [1; 1; 1];
+    direction = [1; -1; -1];
+    
+end
