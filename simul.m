@@ -1,5 +1,7 @@
    
     global T II IF ME MF;
+    global mode;
+    mode = 1;
 
     type = 8;
 
@@ -45,6 +47,28 @@
     plot(t,height);
     title('Height from the surface over time');
 
+    figure(3);
+    v = hypot(vx,vy);
+    p = hypot(x,y);
+
+    energy = v.^2/2 - S./p;
+    angmom = dot(p, v, 2);
+    eccen = sqrt(1+(2*energy.*angmom.^2)./S^2);
+    semimajor = 1./(2./p-v.^2./S);
+    apoapsis = semimajor.*(1+eccen);
+    
+    plot(t,apoapsis-RAD);
+    title('Projected apoapsis over time');
+
+    turnStart = 20E3;
+    turnEnd = 55E3;
+    turnShape = .4;
+    endAngle = 0;
+    orbitalRadTarget = 75E3;
+    figure(4);
+    plot(t,(90-((height-turnStart)./(turnEnd-turnStart)).^turnShape).*(90-endAngle)-8010);
+    
+    
     if (numel(ei)~=0)
         switch ei(1)
             case 1

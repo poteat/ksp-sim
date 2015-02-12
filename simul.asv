@@ -1,6 +1,9 @@
    
     global T II IF ME MF;
-
+    global autopilotMode;
+    autopilotMode = '1';
+    
+    
     type = 8;
 
     T = engine_thrusts(type);
@@ -44,11 +47,19 @@
     figure(2)
     plot(t,height);
     title('Height from the surface over time');
+
+    figure(3);
+    v = hypot(vx,vy);
+    p = hypot(x,y);
+
+    energy = v.^2/2 - S./p;
+    angmom = dot(p, v, 2);
+    eccen = sqrt(1+(2*energy.*angmom.^2)./S^2);
+    semimajor = 1./(2./p-v.^2./S);
+    apoapsis = semimajor.*(1+eccen);
     
-    figure(3)
-    energy = hypot(vx,vy).^2 - S/(height+RAD);
-    plot(t,energy)
-    title('Orbital energy over time');
+    plot(t,apoapsis-RAD);
+    title('Projected apoapsis over time');
 
     if (numel(ei)~=0)
         switch ei(1)
