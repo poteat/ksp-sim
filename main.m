@@ -27,9 +27,9 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 15E3; % height of initial gravity turn
+        TI = 10E3; % height of initial gravity turn
         TF = 45E3; % height of end gravity turn
-        TS = .3; % turn shape
+        TS = .33; % turn shape
         AF = 0; % final angle
         OT = 75E3; % orbital height target
     global TARGET
@@ -55,11 +55,32 @@ function main
             case 2
                 fprintf('Out of fuel\n');
             case 3
-                fprint('Surface collision\n');
+                fprintf('Surface collision\n');
+            case 4
+                fprintf('Atmosphere exited\n');
         end
     else
         fprintf('Simulation timed out\n');
     end
-
+    
+    t = vertical_ascent_time;
+    
+    x  = vertical_ascent_states(1);
+    y  = vertical_ascent_states(2);
+    p = [x,y];
+    d = norm(p);
+    h = d-R;
+    vx = vertical_ascent_states(3);
+    vy = vertical_ascent_states(4);
+    v = [vx,vy];
+    s = norm(v);
+    hv = dot(v,-p);
+    m  = vertical_ascent_states(5);
+    
+    plot(t, h);
+    t
+    d
+    h
+    
     
 end
