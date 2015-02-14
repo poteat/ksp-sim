@@ -27,7 +27,7 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 100E3; % height of initial gravity turn
+        TI = 10E3; % height of initial gravity turn
         TF = 45E3; % height of end gravity turn
         TS = .33; % turn shape
         AF = 0; % final angle
@@ -54,22 +54,73 @@ function main
                 fprintf('Success, vertical ascent height reached\n');
             case 2
                 fprintf('Out of fuel\n');
+                return
             case 3
                 fprintf('Surface collision\n');
+                return
             case 4
                 fprintf('Atmosphere exited\n');
+                return
         end
     else
         fprintf('Simulation timed out\n');
+        return
     end
     
-    t = vertical_ascent_time;
+    gravity_turn_options = odeset('Events',@gravity_turn_events,...
+                                  'NonNegative',5); % mass > 0
     
-    x  = vertical_ascent_states(:,1);
-    y  = vertical_ascent_states(:,2);
-    vx = vertical_ascent_states(:,3);
-    vy = vertical_ascent_states(:,4);
-    m  = vertical_ascent_states(:,5);
+    ex =  vertical_ascent_event_state(1);
+    ey =  vertical_ascent_event_state(2);
+    evx = vertical_ascent_event_state(3);
+    evy = vertical_ascent_event_state(4);
+    em =  vertical_ascent_event_state(5);
+                              
+    gravity_turn_init = [ex, ey, evx, evy, em];                          
+    
+    [gravity_turn_time,...
+        gravity_turn_states,...
+        gravity_turn_event_time,...
+        gravity_turn_event_state,...
+        gravity_turn_event_type] = ode45(@gravity_turn, [0 1000],...
+                                             gravity_turn_init,...
+                                             gravity_turn_options);
+    
+    if (numel(gravity_turn_event_type)~=0)
+        switch gravity_turn_event_type(1)
+            case 1
+                fprintf('Gravity turn height limit reached\n')
+            case 2
+                fprintf('Out of fuel\n')
+                return
+            case 3
+                fprintf('Surface collision\n')
+                return
+            case 4
+                fprintf('Atmosphere exited\n')
+                return
+            case 5
+                fprintf('Height dropped below gravity turn zone')
+                return
+            case 6
+                fprintf('Desired apoapsis reached\n')
+                return
+        end
+    else
+        fprintf('Simulation timed out\n')
+        return
+    end
+    
+    Z = vertcat(vertical_ascent_states, gravity_turn_states(2:end,:));
+    tend = vertical_ascent_time(end);
+    t = vertcat(vertical_ascent_time, gravity_turn_time(2:end)+tend);
+    
+    x  = Z(:,1);
+    y  = Z(:,2);
+    vx = Z(:,3);
+    vy = Z(:,4);
+    m =  Z(:,5);
+    
     p = [x,y];
     d = hypot(x,y);
     h = d-R;
@@ -78,12 +129,6 @@ function main
     pvang = acosd(dot(v,p,2)./(s.*d));
     hv = s.*cosd(pvang);
     tv = s.*sind(pvang);
-    
-    ex =  vertical_ascent_event_state(1);
-    ey =  vertical_ascent_event_state(2);
-    evx = vertical_ascent_event_state(3);
-    evy = vertical_ascent_event_state(4);
-    em =  vertical_ascent_event_state(5);
     
     figure(1)
     plot(t, h);
@@ -118,5 +163,11 @@ function main
     axis square
     axis([-7e5, 7e5, -7e5, 7e5])
     title('Ascent trajectory')
+    
+    figure(6)
+    plot(t,m)
+    xlabel('Time (s)')
+    ylabel('Mass of rocket (tons)')
+    title('Mass of rocket versus time')
     
 end
