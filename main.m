@@ -170,4 +170,6 @@ function main
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
     
+    Z
+
 end
