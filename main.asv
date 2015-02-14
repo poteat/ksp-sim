@@ -27,9 +27,9 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 10E3; % height of initial gravity turn
-        TF = 45E3; % height of end gravity turn
-        TS = .33; % turn shape
+        TI = 15E3; % height of initial gravity turn
+        TF = 55E3; % height of end gravity turn
+        TS = .4; % turn shape
         AF = 0; % final angle
         OT = 75E3; % orbital height target
     global TARGET
@@ -103,7 +103,7 @@ function main
                 fprintf('Height dropped below gravity turn zone')
                 return
             case 6
-                fprintf('Desired apoapsis reached\n')
+                fprintf('Projected apoapsis reached\n')
         end
     else
         fprintf('Simulation timed out\n')
@@ -138,7 +138,6 @@ function main
                 return
             case 3
                 fprintf('Surface collision\n')
-                return
             case 4
                 fprintf('Height dropped below gravity turn zone')
                 return
@@ -146,9 +145,6 @@ function main
     else
         fprintf('Simulation timed out\n')
     end
-    
-    gravity_turn_time
-    coast_time(2:end)+gravity
                                          
     Z = vertcat(vertical_ascent_states,...
                 gravity_turn_states(2:end,:),...
@@ -156,13 +152,13 @@ function main
             
     gravity_turn_time_offset = gravity_turn_time(2:end)+...
                                vertical_ascent_time(end);
-    coast_turn_time_offset = coast_
+    coast_time_offset = coast_time(2:end)+...
+                             gravity_turn_time_offset(end);
                            
     t = vertcat(vertical_ascent_time,...
-                gravity_turn_time(2:end)+vertical_ascent_time(end),...
-                coast_time(2:end)+gravity_turn_time(end));
+                gravity_turn_time_offset,...
+                coast_time_offset);
             
-    t = [0:
             
     x  = Z(:,1);
     y  = Z(:,2);
@@ -218,5 +214,15 @@ function main
     xlabel('Time (s)')
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
+    
+    energy = s(end)^2/2-S/d(end);
+    angmom = dot(p(end),v(end));
+    eccen = sqrt(1+(2*energy*angmom^2)/S^2);
+    semimajor = 1/(2/d(end)-s(end)^2/S);
+    
+    apoapsis = semimajor*(1+norm(eccen)) - R;
+    
+    speed = s(end)
+    distance = d(end)
     
 end

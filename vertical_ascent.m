@@ -21,7 +21,10 @@ function dZ = vertical_ascent(~,Z)
     
     p = [x,y];
     v = [vx,vy];
-    vr = v-RS;
+    
+    pang = atan2d(y,x)-90;
+    vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
+    
     d = norm(p);
     h = d-R;
     

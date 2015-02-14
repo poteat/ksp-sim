@@ -17,7 +17,7 @@ function dZ = coast(~,Z)
     p = [x,y];
     v = [vx,vy];
     
-    pang = 90-atan2d(y,x);
+    pang = atan2d(y,x)-90;
     vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
     
     d = norm(p);

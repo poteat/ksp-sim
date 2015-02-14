@@ -27,9 +27,9 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 10E3; % height of initial gravity turn
-        TF = 45E3; % height of end gravity turn
-        TS = .33; % turn shape
+        TI = 15E3; % height of initial gravity turn
+        TF = 55E3; % height of end gravity turn
+        TS = .4; % turn shape
         AF = 0; % final angle
         OT = 75E3; % orbital height target
     global TARGET
@@ -214,5 +214,12 @@ function main
     xlabel('Time (s)')
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
+    
+    energy = s(end)^2/2-S/d(end);
+    angmom = dot(p(end),v(end));
+    eccen = sqrt(1+(2*energy*angmom^2)/S^2);
+    semimajor = 1/(2/d(end)-s(end)^2/S);
+    
+    apoapsis = semimajor*(1+norm(eccen)) - R;
     
 end
