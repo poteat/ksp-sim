@@ -103,18 +103,63 @@ function main
                 fprintf('Height dropped below gravity turn zone')
                 return
             case 6
-                fprintf('Desired apoapsis reached\n')
-                return
+                fprintf('Projected apoapsis reached\n')
         end
     else
         fprintf('Simulation timed out\n')
         return
     end
     
-    Z = vertcat(vertical_ascent_states, gravity_turn_states(2:end,:));
-    tend = vertical_ascent_time(end);
-    t = vertcat(vertical_ascent_time, gravity_turn_time(2:end)+tend);
+    coast_options = odeset('Events',@coast_events,...
+                                  'NonNegative',5); % mass > 0
     
+    ex =  gravity_turn_event_state(1);
+    ey =  gravity_turn_event_state(2);
+    evx = gravity_turn_event_state(3);
+    evy = gravity_turn_event_state(4);
+    em =  gravity_turn_event_state(5);
+    
+    coast_init = [ex,ey,evx,evy,em];
+    
+    [coast_time,...
+        coast_states,...
+        coast_event_time,...
+        coast_event_state,...
+        coast_event_type] = ode45(@coast, [0 1500],...
+                                             coast_init,...
+                                             coast_options);
+    
+    if (numel(coast_event_type)~=0)
+        switch coast_event_type(1)
+            case 1
+                fprintf('Atmosphere exited (success)\n')
+            case 2
+                fprintf('Out of fuel\n')
+                return
+            case 3
+                fprintf('Surface collision\n')
+            case 4
+                fprintf('Height dropped below gravity turn zone')
+                return
+        end
+    else
+        fprintf('Simulation timed out\n')
+    end
+                                         
+    Z = vertcat(vertical_ascent_states,...
+                gravity_turn_states(2:end,:),...
+                coast_states(2:end,:));
+            
+    gravity_turn_time_offset = gravity_turn_time(2:end)+...
+                               vertical_ascent_time(end);
+    coast_time_offset = coast_time(2:end)+...
+                             gravity_turn_time_offset(end);
+                           
+    t = vertcat(vertical_ascent_time,...
+                gravity_turn_time_offset,...
+                coast_time_offset);
+            
+            
     x  = Z(:,1);
     y  = Z(:,2);
     vx = Z(:,3);
@@ -170,6 +215,4 @@ function main
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
     
-    Z
-
 end

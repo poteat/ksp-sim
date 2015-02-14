@@ -29,12 +29,12 @@ function [value, isterminal, direction] = gravity_turn_events(~,Z)
     d = hypot(x,y);
     s = hypot(vx,vy);
     
-    
     energy = s^2/2-S/d;
     angmom = dot(p,v);
     eccen = sqrt(1+(2*energy*angmom^2)/S^2);
     semimajor = 1/(2/d-s^2/S);
     apoapsis = semimajor*(1+norm(eccen)) - R;
+    
     
     value = [h-TF; m-MF; h; h-AH; h-TI; apoapsis-OT];
     isterminal = [1; 1; 1; 1; 1; 1];
