@@ -6,7 +6,7 @@ function dZ = coast(~,Z)
         T  = CRAFT(1);
         II = CRAFT(2);
         IF = CRAFT(3);
-        
+        G  = PLANET(1);
         R  = PLANET(2);
         RS = PLANET(3);
         S  = PLANET(4);
@@ -33,9 +33,13 @@ function dZ = coast(~,Z)
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
     
+    drag_ang = atan2d(drag(1),d
+    
     throttle = m*norm(drag)/T;
-    throttle
     thrust = throttle*T/m*[cosd(pang), sind(pang)];
+    
+    draggy = norm(drag)
+    thrusty = norm(thrust)
 
 %    a = grav+drag;
     a = grav+drag+thrust;
