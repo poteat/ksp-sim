@@ -2,7 +2,11 @@
 
 function dZ = coast(~,Z)
     
-    global PLANET ATMOSPHERE
+    global CRAFT PLANET ATMOSPHERE
+        T  = CRAFT(1);
+        II = CRAFT(2);
+        IF = CRAFT(3);
+        G  = PLANET(1);
         R  = PLANET(2);
         RS = PLANET(3);
         S  = PLANET(4);
@@ -13,6 +17,7 @@ function dZ = coast(~,Z)
     y = Z(2);
     vx = Z(3);
     vy = Z(4);
+    m = Z(5);
     
     p = [x,y];
     v = [vx,vy];
@@ -27,13 +32,17 @@ function dZ = coast(~,Z)
 
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
+    
+    throttle = m*norm(drag)/T;
+    thrust = throttle*T/m*[cosd(pang), sind(pang)];
 
 %    a = grav+drag;
-    a = grav+drag;
+    a = grav+drag+thrust;
+    dm = throttle*T/(((IF-II)*ap-IF)*G);
 
     ax = a(1);
     ay = a(2);
     
-    dZ = [vx; vy; ax; ay; 0];
+    dZ = [vx; vy; ax; ay; dm];
 
 end

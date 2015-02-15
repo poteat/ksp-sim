@@ -11,31 +11,30 @@ function [value, isterminal, direction] = gravity_turn_events(~,Z)
     global CRAFT PLANET ATMOSPHERE TARGET
         MF = CRAFT(5);
         R  = PLANET(2);
+        S  = PLANET(4);
         AH = ATMOSPHERE(2);
         TI = TARGET(1);
         TF = TARGET(2);
+        OT = TARGET(5);
     
     h = hypot(Z(1),Z(2))-R;
     m = Z(5);
     
     x =  Z(1);
     y =  Z(2);
-    p = [x,y]
+    p = [x,y];
     vx = Z(3);
     vy = Z(4);
-    v = 
+    v = [vx,vy];
     d = hypot(x,y);
     s = hypot(vx,vy);
     
+    a = 1/(2/d-s^2/S);
+    apoapsis = a*(1+sqrt(1-(x*vy-y*vx)^2/(a*S)));
     
-    energy = s^2/2-S/d;
-    angmom = dot(p,v);
-    eccen = sqrt(1+(2*energy*angmom^2)/S^2);
-    semimajor = 1/(2/norm(p)-norm(v)^2/S);
-    apoapsis = semimajor*(1+norm(eccen)) - R;
     
-    value = [h-TF; m-MF; h; h-AH; h-TI];
-    isterminal = [1; 1; 1; 1; 1];
-    direction = [1; -1; -1; 1; -1];
+    value = [h-TF; m-MF; h; h-AH; h-TI; apoapsis-OT];
+    isterminal = [1; 1; 1; 1; 1; 1];
+    direction = [1; -1; -1; 1; -1; 1];
     
 end
