@@ -20,7 +20,6 @@ function dZ = coast(~,Z)
     m = Z(5);
     
     p = [x,y];
-    v = [vx,vy];
     
     pang = atan2d(y,x)-90;
     vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
@@ -30,6 +29,7 @@ function dZ = coast(~,Z)
     
     ap = exp(-h/H);
 
+    
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
     

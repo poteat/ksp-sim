@@ -27,7 +27,7 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 10E3; % height of initial gravity turn
+        TI = 15E3; % height of initial gravity turn
         TF = 45E3; % height of end gravity turn
         TS = .333; % turn shape
         AF = 0; % final angle
@@ -201,6 +201,7 @@ function main
     
     figure(5)
     hold on
+    clf
     plot(x,y)
     rectangle('Position',[ -R, - R, R*2, R*2],...
               'Curvature',[1,1])
