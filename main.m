@@ -1,7 +1,7 @@
    
 function main
-
     clear all
+    
     % Single-stage rocket parameters
         T = 50; % thrust
         II = 300; % isp initial
@@ -32,24 +32,21 @@ function main
         TS = .333; % turn shape
         AF = 0; % final angle
         OT = 75E3; % orbital height target
-    global TARGET
+    global TARGET 
     TARGET = [TI,TF,TS,AF,OT];
     
-    vertical_ascent_options = odeset('Events',@vertical_ascent_events,...
-                                     'NonNegative',5); % mass > 0
+    global STATE TIME
+    
+    opt = odeset('Events',@vertical_ascent_events);
                                  
-    vertical_ascent_init = [0, R, RS, 0, MI];
+    ini = [0, R, RS, 0, MI];
+    range = [0 1000];
 
-    [vertical_ascent_time,...
-        vertical_ascent_states,...
-        vertical_ascent_event_time,...
-        vertical_ascent_event_state,...
-        vertical_ascent_event_type] = ode45(@vertical_ascent, [0 1000],...
-                                             vertical_ascent_init,...
-                                             vertical_ascent_options);
-
-    if (numel(vertical_ascent_event_type)~=0)
-        switch vertical_ascent_event_type(1)
+    [t,Z,~,~,evt] = ode45(@vertical_ascent,range,ini,opt);
+    merge_results(t,Z);
+    
+    if (numel(evt)~=0)
+        switch evt(1)
             case 1
                 fprintf('Success, vertical ascent height reached\n');
             case 2
@@ -67,27 +64,15 @@ function main
         return
     end
     
-    gravity_turn_options = odeset('Events',@gravity_turn_events,...
-                                  'NonNegative',5); % mass > 0
-    
-    ex =  vertical_ascent_event_state(1);
-    ey =  vertical_ascent_event_state(2);
-    evx = vertical_ascent_event_state(3);
-    evy = vertical_ascent_event_state(4);
-    em =  vertical_ascent_event_state(5);
+    opt = odeset('Events',@gravity_turn_events);
                               
-    gravity_turn_init = [ex, ey, evx, evy, em];                          
+    ini = Z(end,:);                          
     
-    [gravity_turn_time,...
-        gravity_turn_states,...
-        gravity_turn_event_time,...
-        gravity_turn_event_state,...
-        gravity_turn_event_type] = ode45(@gravity_turn, [0 1000],...
-                                             gravity_turn_init,...
-                                             gravity_turn_options);
+    [t,Z,~,~,evt] = ode45(@gravity_turn,range,ini,opt);
+    merge_results(t,Z);
     
-    if (numel(gravity_turn_event_type)~=0)
-        switch gravity_turn_event_type(1)
+    if (numel(evt)~=0)
+        switch evt(1)
             case 1
                 fprintf('Gravity turn height limit reached\n')
             case 2
@@ -110,27 +95,15 @@ function main
         return
     end
     
-    coast_options = odeset('Events',@coast_events,...
-                                  'NonNegative',5); % mass > 0
+    opt = odeset('Events',@coast_events);
     
-    ex =  gravity_turn_event_state(1);
-    ey =  gravity_turn_event_state(2);
-    evx = gravity_turn_event_state(3);
-    evy = gravity_turn_event_state(4);
-    em =  gravity_turn_event_state(5);
+    ini = Z(end,:);
     
-    coast_init = [ex,ey,evx,evy,em];
+    [t,Z,~,~,evt] = ode45(@coast,range,ini,opt);
+    merge_results(t,Z);
     
-    [coast_time,...
-        coast_states,...
-        coast_event_time,...
-        coast_event_state,...
-        coast_event_type] = ode45(@coast, [0 1500],...
-                                             coast_init,...
-                                             coast_options);
-    
-    if (numel(coast_event_type)~=0)
-        switch coast_event_type(1)
+    if (numel(evt)~=0)
+        switch evt(1)
             case 1
                 fprintf('Atmosphere exited (success)\n')
             case 2
@@ -146,18 +119,9 @@ function main
         fprintf('Simulation timed out\n')
     end
                                          
-    Z = vertcat(vertical_ascent_states,...
-                gravity_turn_states(2:end,:),...
-                coast_states(2:end,:));
-            
-    gravity_turn_time_offset = gravity_turn_time(2:end)+...
-                               vertical_ascent_time(end);
-    coast_time_offset = coast_time(2:end)+...
-                             gravity_turn_time_offset(end);
-                           
-    t = vertcat(vertical_ascent_time,...
-                gravity_turn_time_offset,...
-                coast_time_offset);
+
+    Z = STATE;
+    t = TIME;
             
             
     x  = Z(:,1);
@@ -222,5 +186,18 @@ function main
     apoapsis
     
     m(end)
+    
+    
+    
+    function merge_results(t,Z)
+        if (numel(STATE) && numel(TIME))
+            STATE = vertcat(STATE,Z(2:end,:));
+            TIME = vertcat(TIME,t(2:end,:)+TIME(end));
+        else
+            STATE = Z(1:end,:);
+            TIME = t(1:end,:);
+        end
+    end
+    
     
 end

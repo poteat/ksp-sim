@@ -4,7 +4,7 @@
 % 3: Surface collision
 % 4: Exit atmosphere
 % 5: Dropped below turnFinal
-% 6: Projected apoapsis reached (TODO)
+% 6: Projected apoapsis reached
 
 function [value, isterminal, direction] = gravity_turn_events(~,Z)
     
