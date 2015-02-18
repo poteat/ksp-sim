@@ -1,7 +1,7 @@
    
 function main
+%% Variable Initialization
     clear all
-    
     % Single-stage rocket parameters
         T = 50; % thrust
         II = 300; % isp initial
@@ -35,14 +35,14 @@ function main
     global TARGET 
     TARGET = [TI,TF,TS,AF,OT];
     
-    global STATE TIME
+    global STATE TIME EVENT
     
-    opt = odeset('Events',@vertical_ascent_events);
-                                 
-    ini = [0, R, RS, 0, MI];
     range = [0 1000];
-
-    [t,Z,~,~,evt] = ode45(@vertical_ascent,range,ini,opt);
+    
+%% Vertical Ascent
+        opt = odeset('Events',@vertical_ascent_events);
+        ini = [0, R, RS, 0, MI];
+        [t,Z,~,~,evt] = ode45(@vertical_ascent,range,ini,opt);
     merge_results(t,Z);
     
     if (numel(evt)~=0)
@@ -63,12 +63,10 @@ function main
         fprintf('Simulation timed out\n');
         return
     end
-    
-    opt = odeset('Events',@gravity_turn_events);
-                              
-    ini = Z(end,:);                          
-    
-    [t,Z,~,~,evt] = ode45(@gravity_turn,range,ini,opt);
+%% Gravity Turn
+        opt = odeset('Events',@gravity_turn_events);          
+        ini = Z(end,:);                          
+        [t,Z,~,~,evt] = ode45(@gravity_turn,range,ini,opt);
     merge_results(t,Z);
     
     if (numel(evt)~=0)
@@ -94,12 +92,10 @@ function main
         fprintf('Simulation timed out\n')
         return
     end
-    
-    opt = odeset('Events',@coast_events);
-    
-    ini = Z(end,:);
-    
-    [t,Z,~,~,evt] = ode45(@coast,range,ini,opt);
+%% Coasting to Atmosphere
+        opt = odeset('Events',@coast_events);
+        ini = Z(end,:);
+        [t,Z,~,~,evt] = ode45(@coast,range,ini,opt);
     merge_results(t,Z);
     
     if (numel(evt)~=0)
@@ -111,6 +107,7 @@ function main
                 return
             case 3
                 fprintf('Surface collision\n')
+                return
             case 4
                 fprintf('Height dropped below gravity turn zone')
                 return
@@ -118,8 +115,7 @@ function main
     else
         fprintf('Simulation timed out\n')
     end
-                                         
-
+%% Results Analysis
     Z = STATE;
     t = TIME;
             
@@ -186,18 +182,17 @@ function main
     apoapsis
     
     m(end)
-    
-    
-    
+%% Subfunctions
     function merge_results(t,Z)
         if (numel(STATE) && numel(TIME))
             STATE = vertcat(STATE,Z(2:end,:));
             TIME = vertcat(TIME,t(2:end,:)+TIME(end));
+            EVENT = vertcat(EVENT,horzcat(TIME(end),Z(end,:)));
+            
         else
-            STATE = Z(1:end,:);
-            TIME = t(1:end,:);
+            STATE = Z;
+            TIME = t;
+            EVENT = horzcat(TIME(end),Z(end,:));
         end
     end
-    
-    
 end
