@@ -26,19 +26,19 @@ function dZ = gravity_turn(~,Z)
     p = [x,y];
     v = [vx,vy];
     
-    pang = atan2d(y,x)-90;
-    vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
+    pang = atan2(y,x)-pi/2;
+    vr = [vx-cos(pang)*RS, vy-sin(pang)*RS];
     
     d = norm(p);
     h = d-R;
     
     ap = exp(-h/H);
     
-    ang = real(90-((h-TI)/(TF-TI))^TS)*(90-AF)-8100+atan2d(y,x);
+    ang = real(pi/2-((h-TI)/(TF-TI))^TS)*(pi/2-AF)-pi^2/4+atan2(y,x);
 
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
-    thrust = T/m*[cosd(ang), sind(ang)];
+    thrust = T/m*[cos(ang), sin(ang)];
 
     a = grav+drag+thrust;
     dm = T/(((IF-II)*ap-IF)*G);

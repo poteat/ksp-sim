@@ -21,8 +21,8 @@ function dZ = coast(~,Z)
     
     p = [x,y];
     
-    pang = atan2d(y,x)-90;
-    vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
+    pang = atan2(y,x)-pi/2;
+    vr = [vx-cos(pang)*RS, vy-sin(pang)*RS];
     
     d = norm(p);
     h = d-R;
@@ -33,10 +33,10 @@ function dZ = coast(~,Z)
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
     
-    drag_ang = atan2d(drag(2),drag(1));
+    drag_ang = atan2(drag(2),drag(1));
     
     throttle = m*norm(drag)/T; % throttle thrust to counteract drag exactly
-    thrust = throttle*T/m*[cosd(drag_ang+180), sind(drag_ang+180)];
+    thrust = throttle*T/m*[cos(drag_ang+180), sin(drag_ang+180)];
 
     a = grav+drag+thrust;
     dm = throttle*T/(((IF-II)*ap-IF)*G);
