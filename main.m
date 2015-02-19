@@ -28,10 +28,10 @@ function main
     
     % Orbital ascent parameters
         TI = 15E3; % height of initial gravity turn
-        TF = 45E3; % height of end gravity turn
+        TF = 50E3; % height of end gravity turn
         TS = .333; % turn shape
         AF = 0; % final angle
-        OT = 75E3; % orbital height target
+        OT = 70E3; % orbital height target
     global TARGET 
     TARGET = [TI,TF,TS,AF,OT];
     
@@ -128,52 +128,14 @@ function main
     d = norm(p);
     s = norm(v);
     
-    specific_orbital_energy = (s^2)/2 - S/d;
-    angular_momentum = cross(p,v);
+    eng = s^2/2-S/d;
+    h = cross(p,v);
+    e = norm(cross(v,h)/S-p/d);
+    a = -S/(2*eng);
     
-    semi_major_axis = -S/(2*specific_orbital_energy);
-    eccentricity = cross(v,angular_momentum)/S - p/d;
-    e = norm(eccentricity);
+    apo = a*(1+e)
     
-    true_anomaly = acos( dot(eccentricity,p)/(norm(eccentricity)*d) );
-    mean_motion = sqrt(S/semi_major_axis^3);
-
-    eccentric_anomaly = 2*atan(sqrt((1-norm(eccentricity))/(1+norm(eccentricity)))*tan(true_anomaly/2));
-    
-    mean_anomaly = eccentric_anomaly-norm(eccentricity)*sin(eccentric_anomaly);
-    
-    time_until_apoapsis = (pi-mean_anomaly)/mean_motion;
-
-    circularization_burn_time = IF*G*m/T*(1-exp( (sqrt(S/d)*(sqrt(1-e)-1))/(IF*G) ));
-    
-    time_until_burn = time_until_apoapsis - circularization_burn_time/2;
-    
-        ini = Z(end,:);
-        [t,Z,~,~,~] = ode45(@spacewait,[0,time_until_burn],ini,opt);
-    merge_results(t,Z);
-%% Circularization Burn
-        opt = odeset('Events',@circularization_events);
-        ini = Z(end,:);
-        [t,Z,~,~,evt] = ode45(@circularization,[0,circularization_burn_time],ini,opt);
-    merge_results(t,Z);
-
-    if (numel(evt)~=0)
-        switch evt(1)
-            case 1
-                fprintf('Orbit circularized\n')
-            case 2
-                fprintf('Out of fuel\n')
-            case 3
-                fprintf('Atmosphere entered\n')
-                return
-            case 4
-                fprintf('Surface collision\n')
-                return
-        end
-    else
-        fprintf('Simulation timed out\n')
-    end
-
+    circularization_deltav = sqrt(S/apo)*(1-sqrt(1-e))
 
 %% Results Analysis
     Z = STATE;
@@ -235,11 +197,6 @@ function main
     xlabel('Time (s)')
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
-    
-    a = 1/(2/d(end)-s(end)^2/S);
-    apoapsis = a*(1+sqrt(1-(x(end)*vy(end)-y(end)*vx(end))^2/(a*S))) - R; 
-    
-    apoapsis
     
     m(end)
 %% Subfunctions
