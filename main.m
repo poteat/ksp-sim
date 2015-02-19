@@ -115,6 +115,35 @@ function main
     else
         fprintf('Simulation timed out\n')
     end
+%% Coast to Apoapsis (Analytical)
+    Z = STATE;
+    x =  Z(end,1);
+    y =  Z(end,2);
+    vx = Z(end,3);
+    vy = Z(end,4);
+    m =  Z(end,5);
+    
+    p = [x,y,0]
+    v = [vx,vy,0]
+    d = norm(p);
+    s = norm(v);
+    
+    specific_orbital_energy = (s^2)/2 - S/d;
+    angular_momentum = cross(p,v);
+    
+    semi_major_axis = -S/(2*specific_orbital_energy);
+    eccentricity = cross(v,angular_momentum)/S - p/d;
+    
+    true_anomaly = acos( dot(eccentricity,p)/(norm(eccentricity)*d) );
+    mean_motion = sqrt(S/semi_major_axis^3);
+
+    eccentric_anomaly = 2*atan(sqrt((1-norm(eccentricity))/(1+norm(eccentricity)))*tan(true_anomaly/2))
+    
+    mean_anomaly = eccentric_anomaly-norm(eccentricity)*sin(eccentric_anomaly)
+    
+    time_until_apoapsis = (pi-mean_anomaly)/mean_motion
+
+
 %% Results Analysis
     Z = STATE;
     t = TIME;
