@@ -133,9 +133,12 @@ function main
     e = norm(cross(v,h)/S-p/d);
     a = -S/(2*eng);
     
-    apo = a*(1+e)
+    apo = a*(1+e);
     
-    circularization_deltav = sqrt(S/apo)*(1-sqrt(1-e))
+    cdv = sqrt(S/apo)*(1-sqrt(1-e));
+    final_mass = m/exp(cdv/IF/G);
+    
+    remaining_dv = IF*G*log(final_mass/MF)
 
 %% Results Analysis
     Z = STATE;
@@ -198,7 +201,6 @@ function main
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
     
-    m(end)
 %% Subfunctions
     function merge_results(t,Z)
         if (numel(STATE) && numel(TIME))
