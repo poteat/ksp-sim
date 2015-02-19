@@ -146,11 +146,34 @@ function main
 
     circularization_burn_time = IF*G*m/T*(1-exp( (sqrt(S/d)*(sqrt(1-e)-1))/(IF*G) ));
     
-    time_until_burn = time_until_apoapsis - circularization_burn_time/2
+    time_until_burn = time_until_apoapsis - circularization_burn_time/2;
     
         ini = Z(end,:);
         [t,Z,~,~,~] = ode45(@spacewait,[0,time_until_burn],ini,opt);
     merge_results(t,Z);
+%% Circularization Burn
+        opt = odeset('Events',@circularization_events);
+        ini = Z(end,:);
+        [t,Z,~,~,evt] = ode45(@circularization,[0,circularization_burn_time],ini,opt);
+    merge_results(t,Z);
+
+    if (numel(evt)~=0)
+        switch evt(1)
+            case 1
+                fprintf('Orbit circularized\n')
+            case 2
+                fprintf('Out of fuel\n')
+            case 3
+                fprintf('Atmosphere entered\n')
+                return
+            case 4
+                fprintf('Surface collision\n')
+                return
+        end
+    else
+        fprintf('Simulation timed out\n')
+    end
+
 
 %% Results Analysis
     Z = STATE;
