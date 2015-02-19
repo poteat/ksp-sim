@@ -115,7 +115,7 @@ function main
     else
         fprintf('Simulation timed out\n')
     end
-%% Coast to Apoapsis (Analytical)
+%% Coast to Circularization Burn (Analytical)
     Z = STATE;
     x =  Z(end,1);
     y =  Z(end,2);
@@ -123,8 +123,8 @@ function main
     vy = Z(end,4);
     m =  Z(end,5);
     
-    p = [x,y,0]
-    v = [vx,vy,0]
+    p = [x,y,0];
+    v = [vx,vy,0];
     d = norm(p);
     s = norm(v);
     
@@ -133,16 +133,24 @@ function main
     
     semi_major_axis = -S/(2*specific_orbital_energy);
     eccentricity = cross(v,angular_momentum)/S - p/d;
+    e = norm(eccentricity);
     
     true_anomaly = acos( dot(eccentricity,p)/(norm(eccentricity)*d) );
     mean_motion = sqrt(S/semi_major_axis^3);
 
-    eccentric_anomaly = 2*atan(sqrt((1-norm(eccentricity))/(1+norm(eccentricity)))*tan(true_anomaly/2))
+    eccentric_anomaly = 2*atan(sqrt((1-norm(eccentricity))/(1+norm(eccentricity)))*tan(true_anomaly/2));
     
-    mean_anomaly = eccentric_anomaly-norm(eccentricity)*sin(eccentric_anomaly)
+    mean_anomaly = eccentric_anomaly-norm(eccentricity)*sin(eccentric_anomaly);
     
-    time_until_apoapsis = (pi-mean_anomaly)/mean_motion
+    time_until_apoapsis = (pi-mean_anomaly)/mean_motion;
 
+    circularization_burn_time = IF*G*m/T*(1-exp( (sqrt(S/d)*(sqrt(1-e)-1))/(IF*G) ));
+    
+    time_until_burn = time_until_apoapsis - circularization_burn_time/2
+    
+        ini = Z(end,:);
+        [t,Z,~,~,~] = ode45(@spacewait,[0,time_until_burn],ini,opt);
+    merge_results(t,Z);
 
 %% Results Analysis
     Z = STATE;
