@@ -1,10 +1,10 @@
 
-% 1: turnInitial height reached
+% 1: turnFinal height reached
 % 2: Out of fuel
 % 3: Surface collision
 % 4: Exit atmosphere
-% 5: Dropped below turnFinal
-% 6: Projected apoapsis reached (TODO)
+% 5: Dropped below turnInitial
+% 6: Projected apoapsis reached
 
 function [value, isterminal, direction] = gravity_turn_events(~,Z)
     
@@ -17,23 +17,27 @@ function [value, isterminal, direction] = gravity_turn_events(~,Z)
         TF = TARGET(2);
         OT = TARGET(5);
     
-    h = hypot(Z(1),Z(2))-R;
-    m = Z(5);
-    
     x =  Z(1);
     y =  Z(2);
-    p = [x,y];
     vx = Z(3);
     vy = Z(4);
-    v = [vx,vy];
-    d = hypot(x,y);
-    s = hypot(vx,vy);
+    m =  Z(5);
     
-    a = 1/(2/d-s^2/S);
-    apoapsis = a*(1+sqrt(1-(x*vy-y*vx)^2/(a*S))) - R;    
+    p = [x,y,0];
+    v = [vx,vy,0];
+    d = norm(p);
+    s = norm(v);
+    h = d-R;
+    
+    eng = s^2/2-S/d;
+    angm = cross(p,v);
+    e = norm(cross(v,angm)/S-p/d);
+    a = -S/(2*eng);
+    
+    apoapsis = a*(1+e)-R;
     
     value = [h-TF; m-MF; h; h-AH; h-TI; apoapsis-OT];
     isterminal = [1; 1; 1; 1; 1; 1];
-    direction = [1; -1; -1; 1; -1; 1];
+    direction = [1; -1; -1; 1; -1; 0];
     
 end

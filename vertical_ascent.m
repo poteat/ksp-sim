@@ -22,18 +22,18 @@ function dZ = vertical_ascent(~,Z)
     p = [x,y];
     v = [vx,vy];
     
-    pang = atan2d(y,x)-90;
-    vr = [vx-cosd(pang)*RS, vy-sind(pang)*RS];
+    pang = atan2(y,x)-pi/2;
+    vr = [vx-cos(pang)*RS, vy-sin(pang)*RS];
     
     d = norm(p);
     h = d-R;
     
     ap = exp(-h/H);
-    ang = atan2d(y,x); 
+    ang = atan2(y,x); 
 
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
-    thrust = T/m*[cosd(ang), sind(ang)];
+    thrust = T/m*[cos(ang), sin(ang)];
 
     a = grav+drag+thrust;
     dm = T/(((IF-II)*ap-IF)*G);

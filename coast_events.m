@@ -17,6 +17,6 @@ function [value, isterminal, direction] = coast_events(~,Z)
     
     value = [h-AH; m-MF; h; h-TF];
     isterminal = [1; 1; 1; 1; 1];
-    direction = [1; -1; -1; -1];
+    direction = [-1; -1; -1; -1];
     
 end
