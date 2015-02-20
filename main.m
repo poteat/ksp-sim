@@ -1,7 +1,7 @@
    
-function main
+function remaining_dv = main(in_TI,in_TF,in_TS,in_AF)
 %% Variable Initialization
-    clear all
+
     % Single-stage rocket parameters
         T = 50; % thrust
         II = 300; % isp initial
@@ -27,15 +27,18 @@ function main
     ATMOSPHERE = [D,AH,H];
     
     % Orbital ascent parameters
-        TI = 15E3; % height of initial gravity turn
-        TF = 50E3; % height of end gravity turn
-        TS = .333; % turn shape
-        AF = 0; % final angle
+        TI = in_TI;%10E3; % height of initial gravity turn
+        TF = in_TF;%45E3; % height of end gravity turn
+        TS = in_TS;%.3; % turn shape
+        AF = in_AF;%0; % final angle
         OT = 70E3; % orbital height target
     global TARGET 
     TARGET = [TI,TF,TS,AF,OT];
-    
+
     global STATE TIME EVENT
+    STATE = [0,0,0,0,0];
+    TIME = [0];
+    EVENT = [0,0,0,0,0,0];
     
     range = [0 1000];
     
@@ -51,16 +54,20 @@ function main
                 fprintf('Success, vertical ascent height reached\n');
             case 2
                 fprintf('Out of fuel\n');
+                remaining_dv = 0;
                 return
             case 3
                 fprintf('Surface collision\n');
+                remaining_dv = 0;
                 return
             case 4
                 fprintf('Atmosphere exited\n');
+                remaining_dv = 0;
                 return
         end
     else
         fprintf('Simulation timed out\n');
+        remaining_dv = 0;
         return
     end
 %% Gravity Turn
@@ -75,25 +82,30 @@ function main
                 fprintf('Gravity turn height limit reached\n')
             case 2
                 fprintf('Out of fuel\n')
+                remaining_dv = 0;
                 return
             case 3
                 fprintf('Surface collision\n')
+                remaining_dv = 0;
                 return
             case 4
                 fprintf('Atmosphere exited\n')
+                remaining_dv = 0;
                 return
             case 5
                 fprintf('Height dropped below gravity turn zone')
+                remaining_dv = 0;
                 return
             case 6
                 fprintf('Projected apoapsis reached\n')
         end
     else
         fprintf('Simulation timed out\n')
+        remaining_dv = 0;
         return
     end
-%% Coasting to Atmosphere
-        opt = odeset('Events',@coast_events);
+%% Coasting to Edge of Atmosphere
+        opt = odeset('Events',@coast_events,'MaxStep',50);
         ini = Z(end,:);
         [t,Z,~,~,evt] = ode45(@coast,range,ini,opt);
     merge_results(t,Z);
@@ -104,16 +116,21 @@ function main
                 fprintf('Atmosphere exited (success)\n')
             case 2
                 fprintf('Out of fuel\n')
+                remaining_dv = 0;
                 return
             case 3
                 fprintf('Surface collision\n')
+                remaining_dv = 0;
                 return
             case 4
-                fprintf('Height dropped below gravity turn zone')
+                fprintf('Height dropped into gravity turn zone')
+                remaining_dv = 0;
                 return
         end
     else
         fprintf('Simulation timed out\n')
+        remaining_dv = 0;
+        return
     end
 %% Coast to Circularization Burn (Analytical)
     Z = STATE;
@@ -138,8 +155,10 @@ function main
     cdv = sqrt(S/apo)*(1-sqrt(1-e));
     final_mass = m/exp(cdv/IF/G);
     
-    remaining_dv = IF*G*log(final_mass/MF)
-
+    remaining_dv = IF*G*log(final_mass/MF);
+    
+if 1
+    
 %% Results Analysis
     Z = STATE;
     t = TIME;
@@ -200,6 +219,8 @@ function main
     xlabel('Time (s)')
     ylabel('Mass of rocket (tons)')
     title('Mass of rocket versus time')
+    
+end
     
 %% Subfunctions
     function merge_results(t,Z)

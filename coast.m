@@ -28,7 +28,6 @@ function dZ = coast(~,Z)
     h = d-R;
     
     ap = exp(-h/H);
-
     
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;

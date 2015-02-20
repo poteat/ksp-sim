@@ -1,9 +1,9 @@
 
-% 1: turnInitial height reached
+% 1: turnFinal height reached
 % 2: Out of fuel
 % 3: Surface collision
 % 4: Exit atmosphere
-% 5: Dropped below turnFinal
+% 5: Dropped below turnInitial
 % 6: Projected apoapsis reached
 
 function [value, isterminal, direction] = gravity_turn_events(~,Z)
