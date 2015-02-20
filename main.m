@@ -1,13 +1,29 @@
    
-function remaining_dv = main(in_TI,in_TF,in_TS,in_AF)
+function remaining_dv = main(in_TWR,in_TI,in_TF,in_TS,in_AF)
+
+TWR = in_TWR;
+T = 215;
+M_engine = 1.25;
+M_payload = 0.1;
+G = 9.82;
+
+M_fuel = (9/10)*(T/(TWR*G)-M_engine-M_payload);
+
+MI = M_engine + M_payload + (10/9)*M_fuel;
+MF = MI - M_fuel;
+
+TWR
+MI
+MF
+
 %% Variable Initialization
 
     % Single-stage rocket parameters
-        T = 50; % thrust
-        II = 300; % isp initial
-        IF = 390; % isp final
-        MI = 2.8; % mass initial
-        MF = 0.8; % mass final
+        T = 215; % thrust
+        II = 320; % isp initial
+        IF = 370; % isp final
+%        MI = 2.8; % mass initial
+%        MF = 0.8; % mass final
     global CRAFT
     CRAFT = [T,II,IF,MI,MF];
     
@@ -155,10 +171,10 @@ function remaining_dv = main(in_TI,in_TF,in_TS,in_AF)
     cdv = sqrt(S/apo)*(1-sqrt(1-e));
     final_mass = m/exp(cdv/IF/G);
     
-    remaining_dv = IF*G*log(final_mass/MF);
+    remaining_dv = IF*G*log(final_mass/MF)
     
     
-if 1
+if 0
     
 %% Results Analysis
     Z = STATE;
