@@ -12,10 +12,7 @@ function [value, isterminal, direction] = vertical_ascent_events(~,Z)
         AH = ATMOSPHERE(2);
         TI = TARGET(1);
     
-    h = hypot(Z(1),Z(2))-R;
-    m = Z(5);
-    
-    value = [h-TI; m-MF; h; h-AH];
+    value = [(hypot(Z(1),Z(2))-R)-TI; Z(5)-MF; (hypot(Z(1),Z(2))-R); (hypot(Z(1),Z(2))-R)-AH];
     isterminal = [1; 1; 1; 1];
     direction = [1; -1; -1; 1];
     

@@ -13,34 +13,16 @@ function dZ = vertical_ascent(~,Z)
         D  = ATMOSPHERE(1);
         H  = ATMOSPHERE(3);
 
-    x = Z(1);
-    y = Z(2);
-    vx = Z(3);
-    vy = Z(4);
-    m = Z(5);
-    
-    p = [x,y];
-    v = [vx,vy];
-    
-    pang = atan2(y,x)-pi/2;
-    vr = [vx-cos(pang)*RS, vy-sin(pang)*RS];
-    
-    d = norm(p);
-    h = d-R;
-    
-    ap = exp(-h/H);
-    ang = atan2(y,x); 
-
-    grav = -S/d^3*p;
-    drag = -D*ap*norm(vr)*vr;
-    thrust = T/m*[cos(ang), sin(ang)];
-
-    a = grav+drag+thrust;
-    dm = T/(((IF-II)*ap-IF)*G);
-
-    ax = a(1);
-    ay = a(2);
-    
-    dZ = [vx; vy; ax; ay; dm];
+    dZ = [Z(3); Z(4); ((-S/norm([Z(1),Z(2)])^3*[Z(1),Z(2)])+(-D*exp(-(...
+        norm([Z(1),Z(2)])-R)/H)*norm([Z(3)-cos(atan2(Z(2),Z(1))-pi/2)*...
+        RS, Z(4)-sin(atan2(Z(2),Z(1))-pi/2)*RS])*[Z(3)-cos(atan2(Z(2),...
+        Z(1))-pi/2)*RS, Z(4)-sin(atan2(Z(2),Z(1))-pi/2)*RS])+(T/Z(5)*[...
+        cos(atan2(Z(2),Z(1))), sin(atan2(Z(2),Z(1)))]))*[1;0]; ((-S/...
+        norm([Z(1),Z(2)])^3*[Z(1),Z(2)])+(-D*exp(-(norm([Z(1),Z(2)])-R...
+        )/H)*norm([Z(3)-cos(atan2(Z(2),Z(1))-pi/2)*RS, Z(4)-sin(atan2(...
+        Z(2),Z(1))-pi/2)*RS])*[Z(3)-cos(atan2(Z(2),Z(1))-pi/2)*RS,...
+        Z(4)-sin(atan2(Z(2),Z(1))-pi/2)*RS])+(T/Z(5)*[cos(atan2(Z(2),...
+        Z(1))), sin(atan2(Z(2),Z(1)))]))*[0;1]; T/(((IF-II)*exp(-...
+        (norm([Z(1),Z(2)])-R)/H)-IF)*G)];
 
 end
