@@ -1,31 +1,9 @@
    
-function remaining_dv = simulate(in_TWR,in_TI,in_TF,in_TS,in_AF)
-
-    TWR = in_TWR;    
-
-T = 650;
-M_engine = 3;
-M_payload = 0.1;
-G = 9.82;
-
-M_fuel = (9/10)*(T/(TWR*G)-M_engine-M_payload);
-
-MI = M_engine + M_payload + (10/9)*M_fuel;
-MF = MI - M_fuel;
-
-MI
-MF
+function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
 
 %% Variable Initialization
-
-    % Single-stage rocket parameters
-        T = 650; % thrust
-        II = 320; % isp initial
-        IF = 370; % isp final
-%        MI = 2.8; % mass initial
-%        MF = 0.8; % mass final
-    global CRAFT
-    CRAFT = [T,II,IF,MI,MF];
+    global STAGE STAGE_PTR
+    STAGE_PTR = 1; % Points to current stage data
     
     % Planetary constants
         G = 9.82;
@@ -60,7 +38,7 @@ MF
     
 %% Vertical Ascent
         opt = odeset('Events',@vertical_ascent_events);
-        ini = [0, R, RS, 0, MI];
+        ini = [0, R, RS, 0, STAGE(1).MI];
         [t,Z,~,~,evt] = ode45(@vertical_ascent,range,ini,opt);
     merge_results(t,Z);
     
@@ -148,7 +126,7 @@ MF
         remaining_dv = 0;
         return
     end
-%% Coast to Circularization Burn (Analytical)
+%% Circularization Burn (Analytical)
     Z = STATE;
     x =  Z(end,1);
     y =  Z(end,2);
@@ -169,12 +147,16 @@ MF
     apo = a*(1+e);
     
     cdv = sqrt(S/apo)*(1-sqrt(1-e));
+    
+    IF = STAGE(STAGE_PTR).E(1).IF;
+    MF = STAGE(STAGE_PTR).MF;
+    
     final_mass = m/exp(cdv/IF/G);
     
     remaining_dv = IF*G*log(final_mass/MF)
     
     
-if 0
+if 1
     
 %% Results Analysis
     Z = STATE;
@@ -241,7 +223,7 @@ end
     
 %% Subfunctions
     function merge_results(t,Z)
-        if (numel(STATE) && numel(TIME))
+        if (numel(STATE)>1 && numel(TIME)>1)
             STATE = vertcat(STATE,Z(2:end,:));
             TIME = vertcat(TIME,t(2:end,:)+TIME(end));
             EVENT = vertcat(EVENT,horzcat(TIME(end),Z(end,:)));

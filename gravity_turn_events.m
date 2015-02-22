@@ -8,8 +8,9 @@
 
 function [value, isterminal, direction] = gravity_turn_events(~,Z)
     
-    global CRAFT PLANET ATMOSPHERE TARGET
-        MF = CRAFT(5);
+    global PLANET ATMOSPHERE TARGET
+    global STAGE STAGE_PTR
+        MF = STAGE(STAGE_PTR).MF;
         R  = PLANET(2);
         S  = PLANET(4);
         AH = ATMOSPHERE(2);

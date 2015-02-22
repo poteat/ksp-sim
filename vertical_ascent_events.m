@@ -6,8 +6,9 @@
 
 function [value, isterminal, direction] = vertical_ascent_events(~,Z)
     
-    global CRAFT PLANET ATMOSPHERE TARGET
-        MF = CRAFT(5);
+    global PLANET ATMOSPHERE TARGET
+    global STAGE STAGE_PTR
+        MF = STAGE(STAGE_PTR).MF;
         R  = PLANET(2);
         AH = ATMOSPHERE(2);
         TI = TARGET(1);

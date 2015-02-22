@@ -2,10 +2,11 @@
 
 function dZ = coast(~,Z)
     
-    global CRAFT PLANET ATMOSPHERE
-        T  = CRAFT(1);
-        II = CRAFT(2);
-        IF = CRAFT(3);
+    global PLANET ATMOSPHERE
+    global STAGE STAGE_PTR
+        T  = STAGE(STAGE_PTR).E(1).T;
+        II = STAGE(STAGE_PTR).E(1).II;
+        IF = STAGE(STAGE_PTR).E(1).IF;
         G  = PLANET(1);
         R  = PLANET(2);
         RS = PLANET(3);

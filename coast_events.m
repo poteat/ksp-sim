@@ -6,8 +6,9 @@
 
 function [value, isterminal, direction] = coast_events(~,Z)
     
-    global CRAFT PLANET ATMOSPHERE TARGET
-        MF = CRAFT(5);
+    global PLANET ATMOSPHERE TARGET
+    global STAGE STAGE_PTR
+        MF = STAGE(STAGE_PTR).MF;
         R  = PLANET(2);
         AH = ATMOSPHERE(2);
         TF = TARGET(2);
@@ -17,6 +18,6 @@ function [value, isterminal, direction] = coast_events(~,Z)
     
     value = [h-AH; m-MF; h; h-TF];
     isterminal = [1; 1; 1; 1; 1];
-    direction = [-1; -1; -1; -1];
+    direction = [1; -1; -1; -1];
     
 end
