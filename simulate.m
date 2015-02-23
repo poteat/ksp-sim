@@ -153,10 +153,10 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     
     final_mass = m/exp(cdv/IF/G);
     
-    remaining_dv = IF*G*log(final_mass/MF)
+    remaining_dv = IF*G*log(final_mass/MF);
     
     
-if 1
+if 0
     
 %% Results Analysis
     Z = STATE;

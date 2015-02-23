@@ -4,9 +4,9 @@ function dZ = vertical_ascent(~,Z)
     
     global PLANET ATMOSPHERE
     global STAGE STAGE_PTR
-        T  = STAGE(STAGE_PTR).E(1).T;
-        II = STAGE(STAGE_PTR).E(1).II;
-        IF = STAGE(STAGE_PTR).E(1).IF;
+        T  = cat(1,STAGE(STAGE_PTR).E.T);
+        II = cat(1,STAGE(STAGE_PTR).E.II);
+        IF = cat(1,STAGE(STAGE_PTR).E.IF);
         G  = PLANET(1);
         R  = PLANET(2);
         RS = PLANET(3);
@@ -34,10 +34,10 @@ function dZ = vertical_ascent(~,Z)
 
     grav = -S/d^3*p;
     drag = -D*ap*norm(vr)*vr;
-    thrust = T/m*[cos(ang), sin(ang)];
+    thrust = sum(T)/m*[cos(ang), sin(ang)];
 
     a = grav+drag+thrust;
-    dm = T/(((IF-II)*ap-IF)*G);
+    dm = sum(T./(((IF-II)*ap-IF)*G));
 
     ax = a(1);
     ay = a(2);

@@ -4,9 +4,9 @@ function dZ = coast(~,Z)
     
     global PLANET ATMOSPHERE
     global STAGE STAGE_PTR
-        T  = STAGE(STAGE_PTR).E(1).T;
-        II = STAGE(STAGE_PTR).E(1).II;
-        IF = STAGE(STAGE_PTR).E(1).IF;
+        T  = cat(1,STAGE(STAGE_PTR).E.T);
+        II = cat(1,STAGE(STAGE_PTR).E.II);
+        IF = cat(1,STAGE(STAGE_PTR).E.IF);
         G  = PLANET(1);
         R  = PLANET(2);
         RS = PLANET(3);
@@ -35,11 +35,11 @@ function dZ = coast(~,Z)
     
     drag_ang = atan2(drag(2),drag(1));
     
-    throttle = m*norm(drag)/T; % throttle thrust to counteract drag exactly
-    thrust = throttle*T/m*[cos(drag_ang+180), sin(drag_ang+180)];
+    throttle = m*norm(drag)/sum(T); % throttle thrust to counteract drag exactly
+    thrust = throttle*sum(T)/m*[cos(drag_ang+180), sin(drag_ang+180)];
 
     a = grav+drag+thrust;
-    dm = throttle*T/(((IF-II)*ap-IF)*G);
+    dm = sum(throttle*T./(((IF-II)*ap-IF)*G));
 
     ax = a(1);
     ay = a(2);
