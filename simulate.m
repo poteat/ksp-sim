@@ -2,6 +2,7 @@
 function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
 
 %% Variable Initialization
+    global DEBUG
     global STAGE STAGE_PTR
     STAGE_PTR = 1; % Points to current stage data
     
@@ -45,22 +46,32 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     if (numel(evt)~=0)
         switch evt(1)
             case 1
-                fprintf('Success, vertical ascent height reached\n');
+                if DEBUG
+                    fprintf('Success, vertical ascent height reached\n');
+                end
             case 2
-                fprintf('Out of fuel\n');
+                if DEBUG
+                    fprintf('Out of fuel\n');
+                end
                 remaining_dv = 0;
                 return
             case 3
-                fprintf('Surface collision\n');
+                if DEBUG
+                    fprintf('Surface collision\n');
+                end
                 remaining_dv = 0;
                 return
             case 4
-                fprintf('Atmosphere exited\n');
+                if DEBUG
+                    fprintf('Atmosphere exited\n');
+                end
                 remaining_dv = 0;
                 return
         end
     else
-        fprintf('Simulation timed out\n');
+        if DEBUG
+            fprintf('Simulation timed out\n');
+        end
         remaining_dv = 0;
         return
     end
@@ -73,28 +84,42 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     if (numel(evt)~=0)
         switch evt(1)
             case 1
-                fprintf('Gravity turn height limit reached\n')
+                if DEBUG
+                    fprintf('Gravity turn height limit reached\n')
+                end
             case 2
-                fprintf('Out of fuel\n')
+                if DEBUG
+                    fprintf('Out of fuel\n')
+                end
                 remaining_dv = 0;
                 return
             case 3
-                fprintf('Surface collision\n')
+                if DEBUG
+                    fprintf('Surface collision\n')
+                end
                 remaining_dv = 0;
                 return
             case 4
-                fprintf('Atmosphere exited\n')
+                if DEBUG
+                    fprintf('Atmosphere exited\n')
+                end
                 remaining_dv = 0;
                 return
             case 5
-                fprintf('Height dropped below gravity turn zone')
+                if DEBUG
+                    fprintf('Height dropped below gravity turn zone')
+                end
                 remaining_dv = 0;
                 return
             case 6
-                fprintf('Projected apoapsis reached\n')
+                if DEBUG
+                    fprintf('Projected apoapsis reached\n')
+                end
         end
     else
-        fprintf('Simulation timed out\n')
+        if DEBUG
+            fprintf('Simulation timed out\n')
+        end
         remaining_dv = 0;
         return
     end
@@ -107,22 +132,32 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     if (numel(evt)~=0)
         switch evt(1)
             case 1
-                fprintf('Atmosphere exited (success)\n')
+                if DEBUG
+                    fprintf('Atmosphere exited (success)\n')
+                end
             case 2
-                fprintf('Out of fuel\n')
+                if DEBUG
+                    fprintf('Out of fuel\n')
+                end
                 remaining_dv = 0;
                 return
             case 3
-                fprintf('Surface collision\n')
+                if DEBUG
+                    fprintf('Surface collision\n')
+                end
                 remaining_dv = 0;
                 return
             case 4
-                fprintf('Height dropped into gravity turn zone')
+                if DEBUG
+                    fprintf('Height dropped into gravity turn zone')
+                end
                 remaining_dv = 0;
                 return
         end
     else
-        fprintf('Simulation timed out\n')
+        if DEBUG
+            fprintf('Simulation timed out\n')
+        end
         remaining_dv = 0;
         return
     end
@@ -156,7 +191,7 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     remaining_dv = IF*G*log(final_mass/MF);
     
     
-if 0
+if DEBUG
     
 %% Results Analysis
     Z = STATE;
