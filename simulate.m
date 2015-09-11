@@ -75,6 +75,13 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
         remaining_dv = 0;
         return
     end
+
+    IF = STAGE(STAGE_PTR).E(1).IF;
+    MF = STAGE(STAGE_PTR).MF;
+    m =  Z(end,5);
+    
+    remaining_dv = IF*G*log(m/MF);
+    
 %% Gravity Turn
         opt = odeset('Events',@gravity_turn_events);          
         ini = Z(end,:);                          
@@ -186,9 +193,15 @@ function remaining_dv = simulate(in_TI,in_TF,in_TS,in_AF)
     IF = STAGE(STAGE_PTR).E(1).IF;
     MF = STAGE(STAGE_PTR).MF;
     
-    final_mass = m/exp(cdv/IF/G);
+    final_mass = m/exp(cdv/IF/G)
     
-    remaining_dv = IF*G*log(final_mass/MF);
+    IF
+    
+    MF
+    
+    circularization_burn = IF*G*log(m/MF) - IF*G*log(final_mass/MF);
+    
+    remaining_dv = IF*G*log(final_mass/MF)
     
     
 if DEBUG

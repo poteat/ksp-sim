@@ -17,7 +17,7 @@ function [value, isterminal, direction] = vertical_ascent_events(~,Z)
     m = Z(5);
     
     value = [h-TI; m-MF; h; h-AH];
-    isterminal = [1; 1; 1; 1];
+    isterminal = [1; 0; 1; 1];
     direction = [1; -1; -1; 1];
     
 end
